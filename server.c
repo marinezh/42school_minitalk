@@ -6,11 +6,11 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:53:27 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/18 12:33:48 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/18 19:30:44 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #define _POSIX_C_SOURCE 200809L
+#define _POSIX_C_SOURCE 200809L
 #include "minitalk.h"
 
 void	handle_signal(int sig, siginfo_t *info, void *context)
@@ -36,11 +36,20 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 	// When we have 8 bits, print the character
 	if (bit_pos == 8)
 	{
-		write(1, &character, 1);
+		if (character == '\0')
+		{
+			write(1, "\n", 1);  // End of message, print newline
+		}
+		else
+		{
+			write(1, &character, 1);  // Print character
+		}
 		// fflush(stdout); //ensure immediate output
 		bit_pos = 0;   // reset bit position for the next char
 		character = 0; // reset char storage
 	}
+	if (character == '\0')
+		write(1, "\n", 1);
 	// Send acknowledgment back to client
 	kill(info->si_pid, SIGUSR1);
 }
