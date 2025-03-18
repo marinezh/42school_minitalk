@@ -6,11 +6,11 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:53:27 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/14 15:02:21 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:33:48 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define _POSIX_C_SOURCE 200809L
+// #define _POSIX_C_SOURCE 200809L
 #include "minitalk.h"
 
 void	handle_signal(int sig, siginfo_t *info, void *context)
@@ -21,16 +21,25 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 	(void)context; // Unused parameter
 	// If SIGUSR1 is received, bit = 0; If SIGUSR2, bit = 1
 	if (sig == SIGUSR1)
+	{
+		// printf("Server got SIGUSR1 (bit 0) from the client %d\n",
+		// info->si_pid);
 		character |= (0 << bit_pos);
+	}
 	else if (sig == SIGUSR2)
+	{
+		// printf("Server got SIGUSR2 (bit 0) from the client %d\n",
+		// info->si_pid);
 		character |= (1 << bit_pos);
+	}
 	bit_pos++;
 	// When we have 8 bits, print the character
 	if (bit_pos == 8)
 	{
 		write(1, &character, 1);
-		bit_pos = 0;
-		character = 0;
+		// fflush(stdout); //ensure immediate output
+		bit_pos = 0;   // reset bit position for the next char
+		character = 0; // reset char storage
 	}
 	// Send acknowledgment back to client
 	kill(info->si_pid, SIGUSR1);
@@ -38,10 +47,9 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 
 int	main(void)
 {
-	struct sigaction	sa;
-
+	struct sigaction sa; // struct to handle signal actions
+	printf("Server started. PID: %d\n", getpid());
 	// Get server PID
-	printf("Server PID: %d\n", getpid());
 	// Set up signal handler
 	sa.sa_sigaction = handle_signal;
 	sa.sa_flags = SA_SIGINFO;
