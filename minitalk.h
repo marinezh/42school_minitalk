@@ -6,13 +6,14 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 13:45:39 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:08:20 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:03:47 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINITALK_H
 # define MINITALK_H
 
+#define BUFFER_SIZE 10000
 
 #define _POSIX_C_SOURCE 200809L
 #include <unistd.h>

@@ -6,33 +6,66 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:53:27 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 13:53:26 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:03:20 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "minitalk.h"
 
-void	handle_signal(int sig, siginfo_t *info, void *context)
-{
-	static int	bit_pos = 0;
-	static char	character = 0;
+// void	handle_signal(int sig, siginfo_t *info, void *context)
+// {
+// 	static int	bit_pos = 0;
+// 	static char	character = 0;
 
-	(void)context;
-	if (sig == SIGUSR2)
-		character |= (1 << bit_pos); // Set bit to 1 if SIGUSR2 received
-	bit_pos++;
-	if (bit_pos == 8) // After receiving 8 bits, print the character
-	{
-		if (character != '\0')
-			write(1, &character, 1);
-		else
-			write(1, "\n", 1);
-		bit_pos = 0;
-		character = 0;
-	}
-	// Send acknowledgment to client after processing the bit
-	kill(info->si_pid, SIGUSR1);
+// 	(void)context;
+// 	if (sig == SIGUSR2)
+// 		character |= (1 << bit_pos); // Set bit to 1 if SIGUSR2 received
+// 	bit_pos++;
+// 	if (bit_pos == 8) // After receiving 8 bits, print the character
+// 	{
+// 		if (character != '\0')
+// 			write(1, &character, 1);
+// 		else
+// 			write(1, "\n", 1);
+// 		bit_pos = 0;
+// 		character = 0;
+// 	}
+// 	// Send acknowledgment to client after processing the bit
+// 	kill(info->si_pid, SIGUSR1);
+// }
+void handle_signal(int sig, siginfo_t *info, void *context)
+{
+    static int  bit_pos = 0;
+    static char character = 0;
+    static char message[BUFFER_SIZE];
+    static int  msg_index = 0;
+
+    (void)context;
+    if (sig == SIGUSR2)
+        character |= (1 << bit_pos);  // Set bit to 1 if SIGUSR2 received
+    bit_pos++;
+
+    if (bit_pos == 8)  // Completed a character
+    {
+        if (character == '\0')  // End of message
+        {
+            message[msg_index] = '\0';  // Null-terminate the buffer
+            write(1, message, strlen(message));
+            write(1, "\n", 1);  // Optional: Add newline for readability
+            // Reset for the next message
+            msg_index = 0;
+        }
+        else
+        {
+            if (msg_index < BUFFER_SIZE - 1)  // Avoid buffer overflow
+                message[msg_index++] = character;
+        }
+        bit_pos = 0;
+        character = 0;
+    }
+    // Acknowledge to the client
+    kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)

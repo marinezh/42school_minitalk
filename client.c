@@ -6,7 +6,7 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:54:30 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:09:04 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 17:33:35 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,8 @@ void	send_char(pid_t server_pid, char c)
 		bit++;
 		//sleep(100);
 		while (!ack_received)
-			sleep(100);
+			pause();
 	}
-	// ack_received = 0;
-	// while (!ack_received)
-	// 	pause();
 }
 
 int	main(int argc, char *argv[])
