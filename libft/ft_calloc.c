@@ -1,24 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 13:45:39 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:08:20 by mzhivoto         ###   ########.fr       */
+/*   Created: 2024/11/09 16:18:41 by mzhivoto          #+#    #+#             */
+/*   Updated: 2024/11/19 18:19:12 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINITALK_H
-# define MINITALK_H
+#include "libft.h"
 
+void	*ft_calloc(size_t nmemb, size_t size)
+{
+	size_t	total_size;
+	void	*ptr;
 
-#define _POSIX_C_SOURCE 200809L
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <signal.h>
-
-#endif
+	total_size = nmemb * size;
+	if (nmemb != 0 && total_size / nmemb < size)
+		return (NULL);
+	ptr = malloc(total_size);
+	if (ptr == NULL)
+		return (NULL);
+	ft_memset(ptr, 0, total_size);
+	return (ptr);
+}

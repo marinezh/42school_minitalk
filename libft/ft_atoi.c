@@ -1,24 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 13:45:39 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:08:20 by mzhivoto         ###   ########.fr       */
+/*   Created: 2024/07/09 22:30:53 by mzhivoto          #+#    #+#             */
+/*   Updated: 2024/11/19 18:17:25 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINITALK_H
-# define MINITALK_H
+int	ft_atoi(const char *str)
+{
+	int			i;
+	long long	nbr;
+	int			minus;
 
-
-#define _POSIX_C_SOURCE 200809L
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <signal.h>
-
-#endif
+	i = 0;
+	nbr = 0;
+	minus = 1;
+	while ((str[i] >= 9 && str[i] <= 13) || str[i] == ' ')
+		i++;
+	if (str[i] == '+')
+		i++;
+	else if (str[i] == '-')
+	{
+		minus = -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		nbr = nbr * 10 + (str[i] - '0');
+		i++;
+	}
+	return (nbr * minus);
+}

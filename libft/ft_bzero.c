@@ -1,41 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/10 14:30:04 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/10 16:46:28 by mzhivoto         ###   ########.fr       */
+/*   Created: 2024/10/31 18:52:48 by mzhivoto          #+#    #+#             */
+/*   Updated: 2024/11/19 18:18:48 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
-#include <signal.h>
+#include "libft.h"
 
-int	main(int argv, char **av)
+void	ft_bzero(void *s, size_t n)
 {
-	
-	int pid = fork();
-	if (pid == -1)
-		return 1;
-	if(pid == 0)
+	unsigned char	*str;
+	size_t			i;
+
+	i = 0;
+	str = (unsigned char *)s;
+	while (i < n)
 	{
-		while(1)
-		{
-			printf("some text goes here\n");
-			usleep(50000);
-		}
+		str[i] = '\0';
+		i++;
 	}
-	else
-	{
-		sleep(1);
-		kill(pid, SIGKILL);
-		wait(NULL);
-	}
-	return (0);
 }
+// The  bzero() function erases the data in the n bytes of the memory
+// starting at the location pointed to by s, by writing zeros 
+// (bytes containing '\0') to that area.
+// return value - none

@@ -1,24 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 13:45:39 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:08:20 by mzhivoto         ###   ########.fr       */
+/*   Created: 2024/11/07 18:52:48 by mzhivoto          #+#    #+#             */
+/*   Updated: 2024/11/19 18:24:37 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINITALK_H
-# define MINITALK_H
+#include "libft.h"
 
+char	*ft_strnstr(const char *big, const char *small, size_t l)
+{
+	size_t	i;
+	size_t	j;
 
-#define _POSIX_C_SOURCE 200809L
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <signal.h>
-
-#endif
+	i = 0;
+	if (*small == '\0')
+	{
+		return ((char *)big);
+	}
+	while (i < l && big[i] != '\0')
+	{
+		j = 0;
+		while ((i + j < l && big[i + j] && small[j] && big[i + j] == small[j]))
+		{
+			j++;
+		}
+		if (small[j] == '\0')
+		{
+			return ((char *)&big[i]);
+		}
+		i++;
+	}
+	return (NULL);
+}

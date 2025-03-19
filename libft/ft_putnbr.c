@@ -1,24 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   ft_putnbr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 13:45:39 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 14:08:20 by mzhivoto         ###   ########.fr       */
+/*   Created: 2025/01/02 23:34:19 by mzhivoto          #+#    #+#             */
+/*   Updated: 2025/02/28 16:02:57 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINITALK_H
-# define MINITALK_H
+#include "libft.h"
 
+int	ft_putnbr(int nb)
+{
+	unsigned int	nbr;
+	int				count;
 
-#define _POSIX_C_SOURCE 200809L
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <signal.h>
-
-#endif
+	count = 0;
+	if (nb < 0)
+	{
+		ft_putchar('-');
+		nbr = nb * -1;
+		count++;
+	}
+	else
+		nbr = nb;
+	if (nbr >= 10)
+		count += ft_putnbr(nbr / 10);
+	count += ft_putchar(nbr % 10 + '0');
+	return (count);
+}
