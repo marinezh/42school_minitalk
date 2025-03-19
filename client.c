@@ -6,7 +6,7 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:54:30 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/18 19:22:50 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 02:15:38 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,13 @@
 
 volatile sig_atomic_t	ack_received = 0;
 
+void	handle_ack(int sig)
+{
+	(void)sig;
+	// write(1, "Ack\n", 4);
+	// printf("Acknowledgment received from server\n");
+	ack_received = 1;
+}
 void	send_char(pid_t server_pid, char c)
 {
 	int	bit;
@@ -21,29 +28,25 @@ void	send_char(pid_t server_pid, char c)
 	bit = 0;
 	while (bit < 8)
 	{
+		ack_received = 0;
 		if ((c >> bit) & 1) // if the bit is 1
 		{
 			// printf("Sending bit 1 for character '%c'\n", c);
 			kill(server_pid, SIGUSR2); // Send 1
 		}
-		else if (!((c >> bit) & 1)) // if the bit is 0
+		else // if the bit is 0
 		{
 			// printf("Sending bit 0 for character '%c'\n", c);
 			kill(server_pid, SIGUSR1); // Send 0
 		}
-		if (!ack_received)
-			pause();
-		ack_received = 0;
 		bit++;
+		usleep(100);
+		while (!ack_received)
+			pause();
 	}
-}
-
-void	handle_ack(int sig)
-{
-	(void)sig;
-	// write(1, "Ack\n", 4);
-	// printf("Acknowledgment received from server\n");
-	ack_received = 1;
+	// ack_received = 0;
+	// while (!ack_received)
+	// 	pause();
 }
 
 int	main(int argc, char *argv[])
@@ -58,17 +61,11 @@ int	main(int argc, char *argv[])
 		return (1);
 	}
 	server_pid = atoi(argv[1]);
-	// Register signal handler for acknowledgment
-	if (server_pid == 0 || kill(server_pid, 0))
-	{
-		printf("Process with this id doesn't exist\n");
-		return (1);
-	}
 	sa.sa_handler = handle_ack;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGUSR1, &sa, NULL);
-
+		// Figure out why we have only sigaction for SIGUSR1
 	// Send message character by character
 	i = 0;
 	printf("Sending message to server (PID %d): %s\n", server_pid, argv[2]);
@@ -80,8 +77,8 @@ int	main(int argc, char *argv[])
 	send_char(server_pid, '\0');
 	return (0);
 }
-	// if (sigaction(SIGUSR1, &sa, NULL) == -1)
-	// {
-	// 	perror("sigaction");
-	// 	return (1);
-	// }
+// if (sigaction(SIGUSR1, &sa, NULL) == -1)
+// {
+// 	perror("sigaction");
+// 	return (1);
+// }
