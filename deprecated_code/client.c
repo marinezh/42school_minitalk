@@ -6,7 +6,7 @@
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:54:30 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 21:00:10 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 17:33:35 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ volatile sig_atomic_t	ack_received = 0;
 void	handle_ack(int sig)
 {
 	(void)sig;
+	// write(1, "Ack\n", 4);
+	// printf("Acknowledgment received from server\n");
 	ack_received = 1;
 }
 void	send_char(pid_t server_pid, char c)
@@ -28,42 +30,23 @@ void	send_char(pid_t server_pid, char c)
 	while (bit < 8)
 	{
 		ack_received = 0;
-		if ((c >> bit) & 1)
-			kill(server_pid, SIGUSR2);
-		else
-			kill(server_pid, SIGUSR1);
+		if ((c >> bit) & 1) // if the bit is 1
+		{
+			// printf("Sending bit 1 for character '%c'\n", c);
+			kill(server_pid, SIGUSR2); // Send 1
+		}
+		else // if the bit is 0
+		{
+			// printf("Sending bit 0 for character '%c'\n", c);
+			kill(server_pid, SIGUSR1); // Send 0
+		}
 		bit++;
+		//sleep(100);
 		while (!ack_received)
 			pause();
 	}
 }
-int pid_validation(char *str)
-{
-	int server_pid = 0;
-	int i = 0;
 
-	while(str[i])
-	{
-		if(!ft_isdigit(str[i]))
-		{
-			ft_printf("Error: Process ID must be numeric\n");
-			exit (1);
-		}
-		i++;
-	}
-	server_pid = ft_atoi(str);
-	if (server_pid <= 1)
-	{
-		ft_printf("Error: PID %d is invalid.\n", server_pid);
-		exit(1);
-	}
-	if (kill(server_pid, 0) == -1)
-	{
-		ft_printf("Error: Process %d does not exist.\n", server_pid);
-		exit(1);
-	}
-	return (server_pid);
-}
 int	main(int argc, char *argv[])
 {
 	pid_t				server_pid;
@@ -72,11 +55,10 @@ int	main(int argc, char *argv[])
 
 	if (argc != 3)
 	{
-		ft_printf("Usage: %s <server_pid> <message>\n", argv[0]);
+		printf("Usage: %s <server_pid> <message>\n", argv[0]);
 		return (1);
 	}
-	server_pid = pid_validation(argv[1]);
-
+	server_pid = atoi(argv[1]);
 	sa.sa_handler = handle_ack;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
@@ -93,3 +75,8 @@ int	main(int argc, char *argv[])
 	send_char(server_pid, '\0');
 	return (0);
 }
+// if (sigaction(SIGUSR1, &sa, NULL) == -1)
+// {
+// 	perror("sigaction");
+// 	return (1);
+// }
