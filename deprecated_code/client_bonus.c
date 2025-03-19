@@ -1,24 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mzhivoto <mzhivoto@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 14:54:30 by mzhivoto          #+#    #+#             */
-/*   Updated: 2025/03/19 23:36:17 by mzhivoto         ###   ########.fr       */
+/*   Updated: 2025/03/19 23:11:40 by mzhivoto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 #include <unistd.h>
 
-volatile sig_atomic_t	g_ack_received = 0;
+volatile sig_atomic_t	ack_received = 0;
 
-void	handle_ack(int sig)
+
+void handle_ack(int sig)
 {
-	(void)sig;
-	g_ack_received = 1;
+    if (sig == SIGUSR1) // Bit acknowledgment
+        ack_received = 1;
+    else if (sig == SIGUSR2 ) // Final acknowledgment from server
+    {
+        printf("✅ Server received and printed the whole message ✅\n");
+        exit(0); // Optional: Exit gracefully after printing
+    }
 }
 
 void	send_char(pid_t server_pid, char c)
@@ -28,17 +34,16 @@ void	send_char(pid_t server_pid, char c)
 	bit = 0;
 	while (bit < 8)
 	{
-		g_ack_received = 0;
+		ack_received = 0;
 		if ((c >> bit) & 1)
 			kill(server_pid, SIGUSR2);
 		else
 			kill(server_pid, SIGUSR1);
 		bit++;
-		while (!g_ack_received)
+		while (!ack_received)
 			pause();
 	}
 }
-
 int	pid_validation(char *str)
 {
 	int	server_pid;
@@ -67,7 +72,6 @@ int	pid_validation(char *str)
 	}
 	return (server_pid);
 }
-
 int	main(int argc, char *argv[])
 {
 	pid_t				server_pid;
@@ -84,12 +88,16 @@ int	main(int argc, char *argv[])
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	i = 0;
+
+	//printf("Sending message to server (PID %d): %s\n", server_pid, argv[2]);
 	while (argv[2][i] != '\0')
 	{
 		send_char(server_pid, argv[2][i]);
 		i++;
 	}
 	send_char(server_pid, '\0');
+	pause();
 	return (0);
 }
